@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <Windows.h>
+#include <chrono>
 
 int nScreenWidth = 120;
 int nScreenHeight = 40;
@@ -46,17 +47,33 @@ int main() {
     map += L"#..............#";
     map += L"################";
 
+    auto tp1 = std::chrono::system_clock::now();
+    auto tp2 = std::chrono::system_clock::now();
 
     while (1) {
 
+		tp2 = std::chrono::system_clock::now();
+		std::chrono::duration<double> elapsedTime = tp2 - tp1;
+        tp1 = tp2;
+        float fElapsedTime = elapsedTime.count();
+
         if (GetAsyncKeyState((unsigned short)'A') & 0x8000) {
-            fPlayerAngle -= 0.0001f;
+            fPlayerAngle -= (0.1f) * fElapsedTime;
         }
 
         if (GetAsyncKeyState((unsigned short)'D') & 0x8000) {
-            fPlayerAngle += 0.0001f;
+            fPlayerAngle += (0.1f) * fElapsedTime;
         }
-       
+
+        if (GetAsyncKeyState((unsigned short)'W') & 0x8000) {
+            fPlayerX += sinf(fPlayerAngle) * 5.0f * fElapsedTime;
+            fPlayerY += cosf(fPlayerAngle) * 5.0f * fElapsedTime;
+        }
+
+        if (GetAsyncKeyState((unsigned short)'S') & 0x8000) {
+            fPlayerX -= sinf(fPlayerAngle) * 5.0f * fElapsedTime;
+            fPlayerY -= cosf(fPlayerAngle) * 5.0f * fElapsedTime;
+        }
 
         for (int x = 0; x < nScreenWidth; x++) {
             float fRayAngle = (fPlayerAngle - fFOV / 2.0f) + ((float)x / (float)nScreenWidth) * fFOV;
@@ -87,12 +104,26 @@ int main() {
             int nCeiling = (float)(nScreenHeight / 2.0) - nScreenHeight / ((float)fDistanceToWall);
             int nFloor = nScreenHeight - nCeiling;
 
+            short nShade = ' ';
+
+            if (fDistanceToWall <= fDepth / 4.0f) {
+                nShade = 0x2588;
+            } else if (fDistanceToWall < fDepth / 3.0f) {
+                nShade = 0x2593;
+            } else if (fDistanceToWall < fDepth / 2.0f) {
+                nShade = 0x2592;
+            } else if (fDistanceToWall < fDepth) {
+                nShade = 0x2591;
+            } else {
+                nShade = ' ';
+            }
+
             for (int y = 0; y < nScreenHeight; y++) {
                 if (y < nCeiling) {
                     screen[y * nScreenWidth + x] = ' ';
                 }
                 else if (y > nCeiling && y <= nFloor) {
-                    screen[y * nScreenWidth + x] = '#';
+                    screen[y * nScreenWidth + x] = nShade;
                 }
                 else {
                     screen[y * nScreenWidth + x] = ' ';
