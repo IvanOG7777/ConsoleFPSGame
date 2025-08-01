@@ -53,6 +53,14 @@ int main() {
 
     bool gameRun = true;
 
+    POINT mousePosition;
+    int screenX = GetSystemMetrics(SM_CXSCREEN) / 2;
+    int screenY = GetSystemMetrics(SM_CYSCREEN) / 2;
+    float mouseSensitivity = 0.0015f;
+    ShowCursor(FALSE);
+    SetCursorPos(screenX, screenY);
+   
+
     while (gameRun) {
 
 		tp2 = std::chrono::system_clock::now();
@@ -60,13 +68,43 @@ int main() {
         tp1 = tp2;
         float fElapsedTime = elapsedTime.count();
 
-        if (GetAsyncKeyState((unsigned short)'A') & 0x8000) {
-            fPlayerAngle -= (0.8f) * fElapsedTime;
+        GetCursorPos(&mousePosition);
+        int deltaX = mousePosition.x - screenX;
+
+        fPlayerAngle += deltaX * mouseSensitivity;
+
+        if (fPlayerAngle < 0) fPlayerAngle += 2 * 3.14159f;
+        if (fPlayerAngle >= 2 * 3.14159f) fPlayerAngle -= 2 * 3.14159f;
+
+        SetCursorPos(screenX, screenY);
+
+        if (GetAsyncKeyState((unsigned short)'Q') & 0x8000) {
+            gameRun = false;
+            return 0;
         }
 
         if (GetAsyncKeyState((unsigned short)'D') & 0x8000) {
-            fPlayerAngle += (0.8f) * fElapsedTime;
+            float strafeAngle = fPlayerAngle + (3.14159f / 2.0f);
+            fPlayerX += sinf(strafeAngle) * 5.0f * fElapsedTime;
+            fPlayerY += cosf(strafeAngle) * 5.0f * fElapsedTime;
+
+            if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#') {
+                fPlayerX -= sinf(strafeAngle) * 5.0f * fElapsedTime;
+                fPlayerY -= cosf(strafeAngle) * 5.0f * fElapsedTime;
+            }
         }
+
+        if (GetAsyncKeyState((unsigned short)'A') & 0x8000) {
+            float strafeAngle = fPlayerAngle - (3.14159f / 2.0f);
+            fPlayerX += sinf(strafeAngle) * 5.0f * fElapsedTime;
+            fPlayerY += cosf(strafeAngle) * 5.0f * fElapsedTime;
+
+            if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#') {
+                fPlayerX -= sinf(strafeAngle) * 5.0f * fElapsedTime;
+                fPlayerY -= cosf(strafeAngle) * 5.0f * fElapsedTime;
+            }
+        }
+
 
         if (GetAsyncKeyState((unsigned short)'W') & 0x8000) {
             fPlayerX += sinf(fPlayerAngle) * 5.0f * fElapsedTime;
