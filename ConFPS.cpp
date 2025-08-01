@@ -166,7 +166,7 @@ int main() {
                         float fBound = 0.01;
                         if (acos(p.at(0).second) < fBound) bBoundry = true;
                         if (acos(p.at(1).second) < fBound) bBoundry = true;
-                        //if (acos(p.at(2).second) < fBound) bBoundry = true;
+                        if (acos(p.at(2).second) < fBound) bBoundry = true;
                     }
                 }
             }
@@ -192,7 +192,11 @@ int main() {
 
             for (int y = 0; y < nScreenHeight; y++) {
                 if (y < nCeiling) {
-                    screen[y * nScreenWidth + x] = ' ';
+                    float ceiling = ((float)y - 0.0f) / ((float)nCeiling);
+                    if (ceiling < 0.25f) screen[y * nScreenWidth + x] = '~';
+                    else if (ceiling < 0.5f) screen[y * nScreenWidth + x] = '-';
+                    else if (ceiling < 0.75f) screen[y * nScreenWidth + x] = '.';
+                    else screen[y * nScreenWidth + x] = ' ';
                 }
                 else if (y >= nCeiling && y <= nFloor) {
                     screen[y * nScreenWidth + x] = nShade;
