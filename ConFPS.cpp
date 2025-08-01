@@ -7,6 +7,7 @@
 #include <vector>
 #include <Windows.h>
 #include <chrono>
+#include <algorithm>
 
 int nScreenWidth = 120;
 int nScreenHeight = 40;
@@ -50,7 +51,9 @@ int main() {
     auto tp1 = std::chrono::system_clock::now();
     auto tp2 = std::chrono::system_clock::now();
 
-    while (1) {
+    bool gameRun = true;
+
+    while (gameRun) {
 
 		tp2 = std::chrono::system_clock::now();
 		std::chrono::duration<double> elapsedTime = tp2 - tp1;
@@ -68,11 +71,21 @@ int main() {
         if (GetAsyncKeyState((unsigned short)'W') & 0x8000) {
             fPlayerX += sinf(fPlayerAngle) * 5.0f * fElapsedTime;
             fPlayerY += cosf(fPlayerAngle) * 5.0f * fElapsedTime;
+
+            if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#') {
+                fPlayerX -= sinf(fPlayerAngle) * 5.0f * fElapsedTime;
+                fPlayerY -= cosf(fPlayerAngle) * 5.0f * fElapsedTime;
+            }
         }
 
         if (GetAsyncKeyState((unsigned short)'S') & 0x8000) {
             fPlayerX -= sinf(fPlayerAngle) * 5.0f * fElapsedTime;
             fPlayerY -= cosf(fPlayerAngle) * 5.0f * fElapsedTime;
+
+            if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#') {
+                fPlayerX += sinf(fPlayerAngle) * 5.0f * fElapsedTime;
+                fPlayerY += cosf(fPlayerAngle) * 5.0f * fElapsedTime;
+            }
         }
 
         for (int x = 0; x < nScreenWidth; x++) {
@@ -80,6 +93,7 @@ int main() {
 
             float fDistanceToWall = 0;
             bool bHitWall = false;
+            bool bBoundry = false;
 
             float fEyeX = sinf(fRayAngle);
             float fEyeY = cosf(fRayAngle);
@@ -97,6 +111,24 @@ int main() {
                 else {
                     if (map[nTestY * nMapWidth + nTestX] == '#') {
                         bHitWall = true;
+
+                        std::vector < std::pair<float, float >> p;
+
+                        for (int tx = 0; tx < 2; tx++) {
+                            for (int ty = 0; ty < 2; ty++) {
+                                float vy = (float)nTestY + ty - fPlayerY;
+                                float vx = (float)nTestX + tx - fPlayerX;
+                                float d = sqrt(vx * vx + vy * vy);
+                                float dotProduct = (fEyeX * vx / d) + (fEyeY * vy / d);
+                                p.push_back(std::make_pair(d, dotProduct));
+                            }
+                        }
+                        std::sort(p.begin(), p.end(), [](const std::pair<float, float>& left, const std::pair<float, float>& right) {return left.first < right.first;});
+
+                        float fBound = 0.01;
+                        if (acos(p.at(0).second) < fBound) bBoundry = true;
+                        if (acos(p.at(1).second) < fBound) bBoundry = true;
+                        //if (acos(p.at(2).second) < fBound) bBoundry = true;
                     }
                 }
             }
@@ -118,11 +150,13 @@ int main() {
                 nShade = ' ';
             }
 
+            if (bBoundry) nShade = ' ';
+
             for (int y = 0; y < nScreenHeight; y++) {
                 if (y < nCeiling) {
                     screen[y * nScreenWidth + x] = ' ';
                 }
-                else if (y > nCeiling && y <= nFloor) {
+                else if (y >= nCeiling && y <= nFloor) {
                     screen[y * nScreenWidth + x] = nShade;
                 }
                 else {
@@ -137,6 +171,17 @@ int main() {
                 }
             }
         }
+
+        swprintf_s(screen, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f, FPS=%3.2f", fPlayerX, fPlayerY, fPlayerAngle, 1.0f / fElapsedTime);
+
+        for (int nx = 0; nx < nMapWidth; nx++) {
+            for (int ny = 0; ny < nMapHeight; ny++) {
+                screen[(ny + 1) * nScreenWidth + nx] = map[ny * nMapWidth + nx];
+            }
+        }
+
+        screen[((int)fPlayerY + 1) * nScreenWidth + (int)fPlayerX] = 'P';
+
         screen[nScreenWidth * nScreenHeight - 1] = '\0';
         WriteConsoleOutputCharacterW(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwByteWritten);
     }
