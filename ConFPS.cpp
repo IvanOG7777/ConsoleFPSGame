@@ -9,16 +9,23 @@
 #include <chrono>
 #include <algorithm>
 
+// scrren height and width
 int nScreenWidth = 120;
 int nScreenHeight = 40;
 
+//position of player in radias
+//placing him in the center of the 16/16 map
 float fPlayerX = 8.0f;
 float fPlayerY = 8.0f;
+
+//initial angle of the player
 float fPlayerAngle = 0.0f;
 
-int nMapHeight = 16;
-int nMapWidth = 16;
+// height and width of the map
+int nMapHeight = 20;
+int nMapWidth = 20;
 
+//fov of the player
 float fFOV = 3.14159 / 4.0;
 float fDepth = 16.0f;
 
@@ -31,22 +38,26 @@ int main() {
 
     std:: wstring map;
 
-    map += L"################";
-    map += L"#..............#";
-    map += L"#..............#";
-    map += L"#..............#";
-    map += L"#..........#...#";
-    map += L"#..........#...#";
-    map += L"#..............#";
-    map += L"#..............#";
-    map += L"#..............#";
-    map += L"#..............#";
-    map += L"#..............#";
-    map += L"#..............#";
-    map += L"#.......########";
-    map += L"#..............#";
-    map += L"#..............#";
-    map += L"################";
+    map += L"####################";
+    map += L"#..................#";
+    map += L"#..................#";
+    map += L"#..................#";
+    map += L"#..........#.......#";
+    map += L"#..........#.......#";
+    map += L"#..................#";
+    map += L"#..................#";
+    map += L"#..................#";
+    map += L"#..................#";
+    map += L"#..................#";
+    map += L"#..................#";
+    map += L"#.......########...#";
+    map += L"#.......#..........#";
+    map += L"#.......########...#";
+    map += L"#.......#..........#";
+    map += L"#.......########...#";
+    map += L"#..................#";
+    map += L"#..................#";
+    map += L"####################";
 
     auto tp1 = std::chrono::system_clock::now();
     auto tp2 = std::chrono::system_clock::now();
