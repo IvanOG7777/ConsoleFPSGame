@@ -36,8 +36,10 @@ int main() {
     SetConsoleActiveScreenBuffer(hConsole);
     DWORD dwByteWritten = 0;
 
+    //uses a wide string that hold w_Char(wide char of 2 bytes) instead of a regular string of 1 byte
+    //allows to use unicode and wide charaters instead of just ascii
     std:: wstring map;
-
+    //1d version of our map used as a 2d one
     map += L"####################";
     map += L"#..................#";
     map += L"#..................#";
@@ -59,9 +61,17 @@ int main() {
     map += L"#..................#";
     map += L"####################";
 
-    auto tp1 = std::chrono::system_clock::now();
-    auto tp2 = std::chrono::system_clock::now();
+    //These two values grap the time of the computer are runtime
+    //They will have diffrent time but the difference is very small.
+    //Used to calculated how much time has passed
+    // tp1 = 12:00:00:00001
+    // tp2 = 12:00:00:00003
+    // elapsedTime = tp2 - tp1
+    // elapsedTime = 00002
+    auto timePoint1 = std::chrono::system_clock::now();
+    auto timePoint2 = std::chrono::system_clock::now();
 
+    // bool to keep game runnig
     bool gameRun = true;
 
     POINT mousePosition;
@@ -74,9 +84,9 @@ int main() {
 
     while (gameRun) {
 
-		tp2 = std::chrono::system_clock::now();
-		std::chrono::duration<double> elapsedTime = tp2 - tp1;
-        tp1 = tp2;
+		timePoint2 = std::chrono::system_clock::now();
+		std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
+        timePoint1 = timePoint2;
         float fElapsedTime = elapsedTime.count();
 
         GetCursorPos(&mousePosition);
