@@ -89,34 +89,43 @@ int main() {
 		timePoint2 = std::chrono::system_clock::now(); // continuously update timePoint2 once per frame with the systems current clock
 		std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1; //calculates the diffrence in time of tp2-tp1 stores in elapsed time in seconds as a double
         timePoint1 = timePoint2; // sets the later time from tp2 to tp1
-        float fElapsedTime = elapsedTime.count(); //gets the current time(in seconds) casts it to float since it was double
+        float fElapsedTime = elapsedTime.count(); //gets the current elapsed time (in seconds) casts it to float since it was stored as a double
 
-        GetCursorPos(&mousePosition);
-        int deltaX = mousePosition.x - screenX;
-        int deltaY = mousePosition.y - screenY;
+        GetCursorPos(&mousePosition); // refercenes the position of the mouse and passes it to GetCursorPos
+       
+        int deltaX = mousePosition.x - screenX; // deltaX used for change in x axis, calculates how far mouse has moved from center of screen on x axis
+        int deltaY = mousePosition.y - screenY; // // deltaY used for change in y axis, calculates how far mouse has moved from center of screen on y axis
 
-        fPlayerAngle += deltaX * mouseSensitivity;
+        fPlayerAngle += deltaX * mouseSensitivity; // takes current deltaX and multilpies it by the sensitivity Ex: 20 * 0.0015f = 0.03
         fPlayerPitch += deltaY * mouseSensitivity;
 
-        if (fPlayerAngle < 0) fPlayerAngle += 2 * 3.14159f;
-        if (fPlayerAngle >= 2 * 3.14159f) fPlayerAngle -= 2 * 3.14159f;
+        if (fPlayerAngle < 0) fPlayerAngle += 2 * 3.14159f; // if angle is less than 0 (too far left) we add 2pi radias to the angle to wrap forward
+        if (fPlayerAngle >= 2 * 3.14159f) fPlayerAngle -= 2 * 3.14159f; // if angle is more than 2pi (too far right) we subtract 2pi radians to wrap backward
 
-        SetCursorPos(screenX, screenY);
+        SetCursorPos(screenX, screenY); // move the mouse back to the center of the screen after every frame
 
-        if (GetAsyncKeyState((unsigned short)'Q') & 0x8000) {
+        if (GetAsyncKeyState((unsigned short)'Q') & 0x8000) { // if key is bieng held down uses ascii code and checks key state with GeetAsynKeyState
             gameRun = false;
             return 0;
         }
 
-        if (GetAsyncKeyState((unsigned short)'D') & 0x8000) {
-            float strafeAngle = fPlayerAngle + (3.14159f / 2.0f);
+        if (GetAsyncKeyState((unsigned short)'D') & 0x8000) { // if key is bieng held down uses ascii code and checks key state with GeetAsynKeyState
+            float strafeAngle = fPlayerAngle + (3.14159f / 2.0f); // adds 90 degrees (1.570795 Radians) to the current angle placing that number to strafe angle
+            // gets current player x coordinate adds and sums the sin of strafe angle * 5 * elapsed time 
+            // if strafe angle is aprox 1.600 (91 degrees)
+            //sin(1.600) * 5 * .016(60fps) = 0.0799
+            //adds 0.0799 to players current x
+            //adds -.00234 to players current y
             fPlayerX += sinf(strafeAngle) * 5.0f * fElapsedTime;
             fPlayerY += cosf(strafeAngle) * 5.0f * fElapsedTime;
 
+            // casts current players x and y floats to their leading integer
+            // if map at index [y * width + x] == '#' since map is 1d
             if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#') {
-                fPlayerX -= sinf(strafeAngle) * 5.0f * fElapsedTime;
-                fPlayerY -= cosf(strafeAngle) * 5.0f * fElapsedTime;
+                fPlayerX -= sinf(strafeAngle) * 5.0f * fElapsedTime; // move back by the same distance we moved up 
+                fPlayerY -= cosf(strafeAngle) * 5.0f * fElapsedTime; // move back by the same distance we moved up 
             }
+            // above happens per frame, we arent actually 'hitting' anything but imediatly moveing back the same distance we moved forward by
         }
 
         if (GetAsyncKeyState((unsigned short)'A') & 0x8000) {
@@ -151,7 +160,7 @@ int main() {
             }
         }
 
-        for (int x = 0; x < nScreenWidth; x++) {
+        for (int x = 0; x < nScreenWidth; x++) { //loop through each x column of the screens width and use that current value of calculations
             float fRayAngle = (fPlayerAngle - fFOV / 2.0f) + ((float)x / (float)nScreenWidth) * fFOV;
 
             float fDistanceToWall = 0;
