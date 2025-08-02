@@ -13,21 +13,22 @@
 int nScreenWidth = 120;
 int nScreenHeight = 40;
 
-//position of player in radias
+//initial position of the player
 //placing him in the center of the 16/16 map
 float fPlayerX = 8.0f;
 float fPlayerY = 8.0f;
 
 //initial angle of the player
 float fPlayerAngle = 0.0f;
+float fPlayerPitch = 0.0f;
 
 // height and width of the map
 int nMapHeight = 20;
 int nMapWidth = 20;
 
-//fov of the player
-float fFOV = 3.14159 / 4.0;
-float fDepth = 16.0f;
+float fFOV = 3.14159 / 4.0; //fov of the player
+float fDepth = 16.0f; // maximum distance the player can see
+float mouseSensitivity = 0.0015f;
 
 
 int main() {
@@ -43,12 +44,12 @@ int main() {
     map += L"####################";
     map += L"#..................#";
     map += L"#..................#";
-    map += L"#..................#";
+    map += L"#.......#######....#";
     map += L"#..........#.......#";
     map += L"#..........#.......#";
-    map += L"#..................#";
-    map += L"#..................#";
-    map += L"#..................#";
+    map += L"#..........#.......#";
+    map += L"#..........#.......#";
+    map += L"#.......#######....#";
     map += L"#..................#";
     map += L"#..................#";
     map += L"#..................#";
@@ -74,25 +75,28 @@ int main() {
     // bool to keep game runnig
     bool gameRun = true;
 
-    POINT mousePosition;
-    int screenX = GetSystemMetrics(SM_CXSCREEN) / 2;
-    int screenY = GetSystemMetrics(SM_CYSCREEN) / 2;
-    float mouseSensitivity = 0.0015f;
-    ShowCursor(FALSE);
-    SetCursorPos(screenX, screenY);
-   
+    POINT mousePosition; // POINT struct that hold an X and Y value of the mouse postion
 
-    while (gameRun) {
+    int screenX = GetSystemMetrics(SM_CXSCREEN) / 2; // GetSystemMetrics gets the screen size, SM_CXSCREEN os the width(X) in pixels, divide by 2 to get middle of screen
+    int screenY = GetSystemMetrics(SM_CYSCREEN) / 2; // GetSystemMetrics gets the screen size, SM_CXYCREEN os the height(Y) in pixels, divide by 2 to get middle of screen
 
-		timePoint2 = std::chrono::system_clock::now();
-		std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
-        timePoint1 = timePoint2;
-        float fElapsedTime = elapsedTime.count();
+    ShowCursor(FALSE); // hides the mouse from view
+    SetCursorPos(screenX, screenY); //sets the cursor to be in the middle of the screen using screen X and Y
+
+    while (gameRun) { //while gameRun is true keep looping
+
+
+		timePoint2 = std::chrono::system_clock::now(); // continuously update timePoint2 once per frame with the systems current clock
+		std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1; //calculates the diffrence in time of tp2-tp1 stores in elapsed time in seconds as a double
+        timePoint1 = timePoint2; // sets the later time from tp2 to tp1
+        float fElapsedTime = elapsedTime.count(); //gets the current time(in seconds) casts it to float since it was double
 
         GetCursorPos(&mousePosition);
         int deltaX = mousePosition.x - screenX;
+        int deltaY = mousePosition.y - screenY;
 
         fPlayerAngle += deltaX * mouseSensitivity;
+        fPlayerPitch += deltaY * mouseSensitivity;
 
         if (fPlayerAngle < 0) fPlayerAngle += 2 * 3.14159f;
         if (fPlayerAngle >= 2 * 3.14159f) fPlayerAngle -= 2 * 3.14159f;
@@ -236,6 +240,7 @@ int main() {
         }
 
         swprintf_s(screen, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f, FPS=%3.2f", fPlayerX, fPlayerY, fPlayerAngle, 1.0f / fElapsedTime);
+
 
         for (int nx = 0; nx < nMapWidth; nx++) {
             for (int ny = 0; ny < nMapHeight; ny++) {
