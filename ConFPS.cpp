@@ -26,7 +26,7 @@ float fPlayerPitch = 0.0f;
 int nMapHeight = 20;
 int nMapWidth = 20;
 
-float fFOV = 3.14159 / 4.0; //fov of the player
+float fFOV = 3.14159 / 3.45; //fov of the player
 float fDepth = 16.0f; // maximum distance the player can see
 float mouseSensitivity = 0.0015f;
 
@@ -201,6 +201,7 @@ int main() {
                         if (acos(p.at(0).second) < fBound) bBoundry = true;
                         if (acos(p.at(1).second) < fBound) bBoundry = true;
                         if (acos(p.at(2).second) < fBound) bBoundry = true;
+                        if (acos(p.at(3).second) < fBound) bBoundry = true;
                     }
                 }
             }
