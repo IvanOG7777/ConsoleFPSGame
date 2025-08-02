@@ -27,7 +27,7 @@ int nMapHeight = 20;
 int nMapWidth = 20;
 
 float fFOV = 3.14159 / 3.45; //fov of the player
-float fDepth = 16.0f; // maximum distance the player can see
+float fDepth = 16.0f; // maximum ray must travel to compute something
 float mouseSensitivity = 0.0015f;
 
 
@@ -161,17 +161,17 @@ int main() {
         }
 
         for (int x = 0; x < nScreenWidth; x++) { //loop through each x column of the screens width and use that current value of calculations
-            float fRayAngle = (fPlayerAngle - fFOV / 2.0f) + ((float)x / (float)nScreenWidth) * fFOV;
+            float fRayAngle = (fPlayerAngle - fFOV / 2.0f) + ((float)x / (float)nScreenWidth) * fFOV; // calculates a ray angle from 0 to n-1 depending on fov and player angle and screen width
 
-            float fDistanceToWall = 0;
-            bool bHitWall = false;
-            bool bBoundry = false;
+            float fDistanceToWall = 0; // calculates how far the ray at current angle must travel before "hitting" something
+            bool bHitWall = false; // bool to check if we have hit said wall set to false as we havnet hit anything yet
+            bool bBoundry = false; // bool to check if we have hit a boundry set to false as we havnet hit anything yet
 
-            float fEyeX = sinf(fRayAngle);
-            float fEyeY = cosf(fRayAngle);
+            float fEyeX = sinf(fRayAngle);// gets current rayAngle and takes the sine, determins how far in the x direction ray must travel
+            float fEyeY = cosf(fRayAngle);// gets current rayAngle and takes the cose, determins how far in the y direction ray must travel
 
-            while (!bHitWall && fDistanceToWall < fDepth) {
-                fDistanceToWall += 0.1f;
+            while (!bHitWall && fDistanceToWall < fDepth) { // keep casting ray fowrard until hitWall is true and while ray travels farther than depth
+                fDistanceToWall += 0.1f; // move ray foward 0.1 units per frame
 
                 int nTestX = (int)(fPlayerX + fEyeX * fDistanceToWall);
                 int nTestY = (int)(fPlayerY + fEyeY * fDistanceToWall);
