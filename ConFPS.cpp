@@ -30,6 +30,13 @@ float fFOV = 3.14159 / 3.45; //fov of the player
 float fDepth = 16.0f; // maximum ray must travel to compute something
 float mouseSensitivity = 0.0015f;
 
+template <typename T>
+T clamp(T value, T min, T max) {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+}
+
 
 int main() {
     wchar_t* screen = new wchar_t[nScreenWidth * nScreenHeight];
@@ -90,6 +97,8 @@ int main() {
 		std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1; //calculates the diffrence in time of tp2-tp1 stores in elapsed time in seconds as a double
         timePoint1 = timePoint2; // sets the later time from tp2 to tp1
         float fElapsedTime = elapsedTime.count(); //gets the current elapsed time (in seconds) casts it to float since it was stored as a double
+        
+        fPlayerPitch = clamp(fPlayerPitch, -1.0f, 1.0f);
 
         GetCursorPos(&mousePosition); // refercenes the position of the mouse and passes it to GetCursorPos
        
@@ -207,6 +216,7 @@ int main() {
             }
 
             int nCeiling = (float)(nScreenHeight / 2.0) - nScreenHeight / ((float)fDistanceToWall);
+           
             int nFloor = nScreenHeight - nCeiling;
 
             short nShade = ' ';
@@ -249,7 +259,7 @@ int main() {
             }
         }
 
-        swprintf_s(screen, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f, FPS=%3.2f", fPlayerX, fPlayerY, fPlayerAngle, 1.0f / fElapsedTime);
+        swprintf_s(screen, nScreenWidth, L"X=%3.2f, Y=%3.2f, A=%3.2f, P=%3.2f, FPS=%3.2f", fPlayerX, fPlayerY, fPlayerAngle, fPlayerPitch ,1.0f / fElapsedTime);
 
 
         for (int nx = 0; nx < nMapWidth; nx++) {
