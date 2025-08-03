@@ -173,18 +173,18 @@ int main() {
             while (!bHitWall && fDistanceToWall < fDepth) { // keep casting ray fowrard until hitWall is true and while ray travels farther than depth
                 fDistanceToWall += 0.1f; // move ray foward 0.1 units per frame
 
-                int nTestX = (int)(fPlayerX + fEyeX * fDistanceToWall);
-                int nTestY = (int)(fPlayerY + fEyeY * fDistanceToWall);
+                int nTestX = (int)(fPlayerX + fEyeX * fDistanceToWall); // Calculates the rays current X position on the map grid 
+                int nTestY = (int)(fPlayerY + fEyeY * fDistanceToWall); // Calculates the rays current Y position on the map grid 
 
-                if (nTestX < 0 || nTestX >= nMapWidth || nTestY < 0 || nTestY >= nMapHeight) {
-                    bHitWall = true;
-                    fDistanceToWall = fDepth;
+                if (nTestX < 0 || nTestX >= nMapWidth || nTestY < 0 || nTestY >= nMapHeight) { // if the x and y positions are not within the map, essentialy meaning we hit a wall
+                    bHitWall = true; // set hitWall to true
+                    fDistanceToWall = fDepth; // cap the distance to depth (16.0f)
                 }
-                else {
-                    if (map[nTestY * nMapWidth + nTestX] == '#') {
-                        bHitWall = true;
+                else { // if we havent hit a wall
+                    if (map[nTestY * nMapWidth + nTestX] == '#') { // if map at current index is a wall(#)
+                        bHitWall = true; // we have hit a wall set hitWall to true
 
-                        std::vector < std::pair<float, float >> p;
+                        std::vector < std::pair<float, float >> p; // create a vector of pairs of type floats
 
                         for (int tx = 0; tx < 2; tx++) {
                             for (int ty = 0; ty < 2; ty++) {

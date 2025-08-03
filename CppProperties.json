@@ -4,7 +4,7 @@
       "inheritEnvironments": [
         "msvc_x86"
       ],
-      "name": "x86-Debug",
+      "name": "x86",
       "includePath": [
         "${env.INCLUDE}",
         "${workspaceRoot}\\**"
