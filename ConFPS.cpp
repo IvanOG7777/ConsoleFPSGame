@@ -215,9 +215,9 @@ int main() {
                 }
             }
 
-            int nCeiling = (float)(nScreenHeight / 2.0) - nScreenHeight / ((float)fDistanceToWall);
-           
-            int nFloor = nScreenHeight - nCeiling;
+            int nWallHeight = (int)(nScreenHeight / fDistanceToWall);
+            int nWallTop = (nScreenHeight / 2) - (nWallHeight / 2) + (fPlayerPitch * nScreenHeight);
+            int nWallBottom = nWallTop + nWallHeight;
 
             short nShade = ' ';
 
@@ -236,14 +236,23 @@ int main() {
             if (bBoundry) nShade = ' ';
 
             for (int y = 0; y < nScreenHeight; y++) {
-                if (y < nCeiling) {
-                    float ceiling = ((float)y - 0.0f) / ((float)nCeiling);
+
+                float fMiddleOfScreen = nScreenHeight / 2.0f;
+                float fDifferenceFromCenter = y - fMiddleOfScreen;
+                float fVerticalAngle = atanf(fDifferenceFromCenter / fMiddleOfScreen);
+                float fTotalPitch = fVerticalAngle + fPlayerPitch;
+
+
+                if (y < nWallTop) {
+
+
+                    float ceiling = ((float)y - 0.0f) / ((float)nWallTop);
                     if (ceiling < 0.25f) screen[y * nScreenWidth + x] = '~';
                     else if (ceiling < 0.5f) screen[y * nScreenWidth + x] = '-';
                     else if (ceiling < 0.75f) screen[y * nScreenWidth + x] = '.';
                     else screen[y * nScreenWidth + x] = ' ';
                 }
-                else if (y >= nCeiling && y <= nFloor) {
+                else if (y >= nWallTop && y <= nWallBottom ) {
                     screen[y * nScreenWidth + x] = nShade;
                 }
                 else {
