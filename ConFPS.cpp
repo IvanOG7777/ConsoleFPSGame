@@ -25,8 +25,8 @@ float fPlayerAngle = 0.0f;
 float fPlayerPitch = 0.0f;
 
 // height and width of the map
-int nMapHeight = 20;
-int nMapWidth = 20;
+int nMapHeight = 50;
+int nMapWidth = 50;
 
 float fFOV = 3.14159 / 2.0; //fov of the player
 float fDepth = 16.0f; // maximum ray must travel to compute something
@@ -145,7 +145,7 @@ int main() {
 
         if (GetAsyncKeyState((unsigned short)'Q') & 0x8000) { // if key is bieng held down uses ascii code and checks key state with GeetAsynKeyState
             gameRun = false;
-            return 0;
+            break;
         }
 
         if (GetAsyncKeyState((unsigned short)'D') & 0x8000) { // if key is bieng held down uses ascii code and checks key state with GeetAsynKeyState
