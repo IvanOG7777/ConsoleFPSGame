@@ -8,6 +8,8 @@
 #include <Windows.h>
 #include <chrono>
 #include <algorithm>
+#undef max
+#undef min
 
 // scrren height and width
 int nScreenWidth = 120;
@@ -23,8 +25,8 @@ float fPlayerAngle = 0.0f;
 float fPlayerPitch = 0.0f;
 
 // height and width of the map
-int nMapHeight = 20;
-int nMapWidth = 20;
+int nMapHeight = 50;
+int nMapWidth = 50;
 
 float fFOV = 3.14159 / 2.0; //fov of the player
 float fDepth = 16.0f; // maximum ray must travel to compute something
@@ -37,6 +39,48 @@ T clamp(T value, T min, T max) {
     return value;
 }
 
+std::vector<std::vector<wchar_t>> generateMap(int height, int width) {
+    std::vector<std::vector<wchar_t>> map(height, std::vector<wchar_t>(width));
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            if (x == 0 || y == 0 || x == width - 1 || y == height - 1) {
+                map[y][x] = '#';
+            }
+            else {
+                map[y][x] = rand() % 100 < 75 ? L'.' : L'#';
+            }
+        }
+    }
+    return map;
+}
+
+std::pair<float, float> getStartingPlaceXY(float& playerX, float& playerY, std::vector<std::vector<wchar_t>>& passedMap) {
+    std::vector<std::vector<wchar_t>> map = passedMap;
+    float middleHeight = map.size() / 2;
+    float middleWidth = map[0].size() / 2;
+
+    bool hasFoundSpot = false;
+    int height = passedMap.size();
+    int width = map[0].size();
+
+    while (hasFoundSpot == false) {
+        int randX = rand() % map.size();
+        int randY = rand() % map[0].size();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (map[randY][randX] == '.') {
+                    hasFoundSpot = true;
+                    return { static_cast<float>(randX), static_cast<float>(randY) };
+                }
+            }
+        }
+    }
+    return { middleHeight, middleWidth };
+}
+
+ 
+
 
 int main() {
     wchar_t* screen = new wchar_t[nScreenWidth * nScreenHeight];
@@ -46,28 +90,12 @@ int main() {
 
     //uses a wide string that hold w_Char(wide char of 2 bytes) instead of a regular string of 1 byte
     //allows to use unicode and wide charaters instead of just ascii
-    std:: wstring map;
-    //1d version of our map used as a 2d one
-    map += L"####################";
-    map += L"#..................#";
-    map += L"#..................#";
-    map += L"#.......#######....#";
-    map += L"#..........#.......#";
-    map += L"#..........#.......#";
-    map += L"#..........#.......#";
-    map += L"#..........#.......#";
-    map += L"#.......#######....#";
-    map += L"#..................#";
-    map += L"#..................#";
-    map += L"#..................#";
-    map += L"#.......########...#";
-    map += L"#.......#..........#";
-    map += L"#.......########...#";
-    map += L"#.......#..........#";
-    map += L"#.......########...#";
-    map += L"#..................#";
-    map += L"#..................#";
-    map += L"####################";
+    srand((unsigned)time(NULL));
+    std::vector<std::vector<wchar_t>> newMap = generateMap(nMapWidth, nMapHeight);
+    auto spawn = getStartingPlaceXY(fPlayerX, fPlayerY, newMap);
+
+    fPlayerX = spawn.first;
+    fPlayerY = spawn.second;
 
     //These two values grap the time of the computer are runtime
     //They will have diffrent time but the difference is very small.
@@ -130,7 +158,7 @@ int main() {
 
             // casts current players x and y floats to their leading integer
             // if map at index [y * width + x] == '#' since map is 1d
-            if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#') {
+            if (newMap[(int)fPlayerY][(int)fPlayerX] == '#') {
                 fPlayerX -= sinf(strafeAngle) * 5.0f * fElapsedTime; // move back by the same distance we moved up 
                 fPlayerY -= cosf(strafeAngle) * 5.0f * fElapsedTime; // move back by the same distance we moved up 
             }
@@ -142,7 +170,7 @@ int main() {
             fPlayerX += sinf(strafeAngle) * 5.0f * fElapsedTime;
             fPlayerY += cosf(strafeAngle) * 5.0f * fElapsedTime;
 
-            if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#') {
+            if (newMap[(int)fPlayerY][(int)fPlayerX] == '#') {
                 fPlayerX -= sinf(strafeAngle) * 5.0f * fElapsedTime;
                 fPlayerY -= cosf(strafeAngle) * 5.0f * fElapsedTime;
             }
@@ -153,7 +181,7 @@ int main() {
             fPlayerX += sinf(fPlayerAngle) * 5.0f * fElapsedTime;
             fPlayerY += cosf(fPlayerAngle) * 5.0f * fElapsedTime;
 
-            if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#') {
+            if (newMap[(int)fPlayerY][(int)fPlayerX] == '#') {
                 fPlayerX -= sinf(fPlayerAngle) * 5.0f * fElapsedTime;
                 fPlayerY -= cosf(fPlayerAngle) * 5.0f * fElapsedTime;
             }
@@ -163,7 +191,7 @@ int main() {
             fPlayerX -= sinf(fPlayerAngle) * 5.0f * fElapsedTime;
             fPlayerY -= cosf(fPlayerAngle) * 5.0f * fElapsedTime;
 
-            if (map[(int)fPlayerY * nMapWidth + (int)fPlayerX] == '#') {
+            if (newMap[(int)fPlayerY][(int)fPlayerX] == '#') {
                 fPlayerX += sinf(fPlayerAngle) * 5.0f * fElapsedTime;
                 fPlayerY += cosf(fPlayerAngle) * 5.0f * fElapsedTime;
             }
@@ -190,7 +218,7 @@ int main() {
                     fDistanceToWall = fDepth; // cap the distance to depth (16.0f)
                 }
                 else { // if we havent hit a wall
-                    if (map[nTestY * nMapWidth + nTestX] == '#') { // if map at current index is a wall(#)
+                    if (newMap[nTestY][nTestX] == '#') {// if map at current index is a wall(#)
                         bHitWall = true; // we have hit a wall set hitWall to true
 
                         std::vector < std::pair<float, float >> p; // create a vector of pairs of type floats
@@ -271,11 +299,12 @@ int main() {
         swprintf_s(screen, nScreenWidth, L"X=%3.2f, Y=%3.2f, A=%3.2f, P=%3.2f, FPS=%3.2f", fPlayerX, fPlayerY, fPlayerAngle, fPlayerPitch ,1.0f / fElapsedTime);
 
 
-        for (int nx = 0; nx < nMapWidth; nx++) {
-            for (int ny = 0; ny < nMapHeight; ny++) {
-                screen[(ny + 1) * nScreenWidth + nx] = map[ny * nMapWidth + nx];
+        for (int ny = 0; ny < std::min(nMapHeight, nScreenHeight - 1); ny++) {
+            for (int nx = 0; nx < std::min(nMapWidth, nScreenWidth); nx++) {
+                screen[(ny + 1) * nScreenWidth + nx] = newMap[ny][nx];
             }
         }
+
 
         screen[((int)fPlayerY + 1) * nScreenWidth + (int)fPlayerX] = 'P';
 
