@@ -26,7 +26,7 @@ float fPlayerPitch = 0.0f;
 int nMapHeight = 20;
 int nMapWidth = 20;
 
-float fFOV = 3.14159 / 3.45; //fov of the player
+float fFOV = 3.14159 / 2.0; //fov of the player
 float fDepth = 16.0f; // maximum ray must travel to compute something
 float mouseSensitivity = 0.0015f;
 
@@ -106,7 +106,7 @@ int main() {
         int deltaY = mousePosition.y - screenY; // // deltaY used for change in y axis, calculates how far mouse has moved from center of screen on y axis
 
         fPlayerAngle += deltaX * mouseSensitivity; // takes current deltaX and multilpies it by the sensitivity Ex: 20 * 0.0015f = 0.03
-        fPlayerPitch += deltaY * mouseSensitivity;
+        fPlayerPitch -= deltaY * mouseSensitivity;
 
         if (fPlayerAngle < 0) fPlayerAngle += 2 * 3.14159f; // if angle is less than 0 (too far left) we add 2pi radias to the angle to wrap forward
         if (fPlayerAngle >= 2 * 3.14159f) fPlayerAngle -= 2 * 3.14159f; // if angle is more than 2pi (too far right) we subtract 2pi radians to wrap backward
@@ -247,9 +247,9 @@ int main() {
 
 
                     float ceiling = ((float)y - 0.0f) / ((float)nWallTop);
-                    if (ceiling < 0.25f) screen[y * nScreenWidth + x] = '~';
-                    else if (ceiling < 0.5f) screen[y * nScreenWidth + x] = '-';
-                    else if (ceiling < 0.75f) screen[y * nScreenWidth + x] = '.';
+                    if (ceiling < 0.5f) screen[y * nScreenWidth + x] = '~';
+                    else if (ceiling < 0.65f) screen[y * nScreenWidth + x] = '-';
+                    else if (ceiling < 0.8f) screen[y * nScreenWidth + x] = '.';
                     else screen[y * nScreenWidth + x] = ' ';
                 }
                 else if (y >= nWallTop && y <= nWallBottom ) {
@@ -259,9 +259,9 @@ int main() {
                     float b = 1.0f - (((float)y - nScreenHeight / 2.0f) / ((float)nScreenHeight / 2.0f));
                     if (b < 0.25) nShade = '#';
                     else if (b < 0.5) nShade = 'x';
-                    else if (b < 0.75) nShade = '.';
-                    else if (b < 0.9) nShade = '-';
-                    else nShade = ' ';
+                    else if (b < 0.75) nShade = '-';
+                    else if (b < 0.8) nShade = '.';
+                    else nShade = '.';
                     screen[y * nScreenWidth + x] = nShade;
 
                 }
