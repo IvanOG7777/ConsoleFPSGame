@@ -25,8 +25,8 @@ float fPlayerAngle = 0.0f;
 float fPlayerPitch = 0.0f;
 
 // height and width of the map
-int nMapHeight = 50;
-int nMapWidth = 50;
+int nMapHeight = 20;
+int nMapWidth = 20;
 
 float fFOV = 3.14159 / 2.0; //fov of the player
 float fDepth = 16.0f; // maximum ray must travel to compute something
@@ -78,6 +78,8 @@ std::pair<float, float> getStartingPlaceXY(float& playerX, float& playerY, std::
     }
     return { middleHeight, middleWidth };
 }
+
+
 
  
 
@@ -312,5 +314,7 @@ int main() {
         WriteConsoleOutputCharacterW(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwByteWritten);
     }
 
+    delete[] screen;
+    CloseHandle(hConsole);
     return 0;
 }
